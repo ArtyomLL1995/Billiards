@@ -464,7 +464,7 @@ class Utils {
     }
     static getSoundLevel(ball) {
         const maxPossibleSpeed = Math.abs(Math.cos(Cue.cueAngle) * this.maxPullOffset) + Math.abs(Math.sin(Cue.cueAngle) * this.maxPullOffset)
-        return Math.max(0.1, Number(((((Math.abs(ball.velocity.x) + Math.abs(ball.velocity.y)) / maxPossibleSpeed) * 100) / 100).toFixed(1)))
+        return Math.max(0.1, Number((((Math.abs(ball.velocity.x) + Math.abs(ball.velocity.y)) / maxPossibleSpeed)).toFixed(1)))
     }
 }
 
