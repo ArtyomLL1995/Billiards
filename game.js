@@ -6,6 +6,7 @@
 // 5. Add shadows (for cue and balls)
 // 6. Add sounds (DONE!)
 // 7 Rewrite all setIntervals with requestAnimationFrame (DONE!!)
+// 8 Change predictionLine width based on the prediction angle
 
 class Game {
     
@@ -38,12 +39,12 @@ class Game {
     static gameLoop() {
         Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
         Canvas.drawField()
+        this.pockets.forEach(pocket => {
+            Utils.draw([],pocket.x,pocket.y,null,null,null,pocket.color,null,true,pocket.size)
+        })
         Utils.handleCollisions()
         this.balls.forEach(ball => {
             ball.drawBall()
-        })
-        this.pockets.forEach(pocket => {
-            Utils.draw([],pocket.x,pocket.y,null,null,null,pocket.color,null,true,pocket.size)
         })
         this.isAnyBallMoving = this.balls.some(ball => ball.velocity.x != 0 || ball.velocity.y != 0)
         if (!this.isAnyBallMoving) {
@@ -92,7 +93,6 @@ class Game {
                 this.currentAccumulatedPower = (Utils.cueHitPower - Utils.startOffset) * Utils.basePowerMultiplyer
                 this.handleMouseDownAnimation = requestAnimationFrame(() => this.handleMouseDown())
             } else {
-                this.handleMouseDownAnimation = null
                 cancelAnimationFrame(this.handleMouseDownAnimation)
             }
             
@@ -121,7 +121,6 @@ class Game {
                 Utils.cueEndPoint = Utils.cueLength + Utils.cueHitPower
                 Game.balls[0].velocity.x = Math.cos(Cue.cueAngle) * this.currentAccumulatedPower
                 Game.balls[0].velocity.y = Math.sin(Cue.cueAngle) * this.currentAccumulatedPower
-                this.currentAccumulatedPower = 0
             }
         }
     }
@@ -296,15 +295,13 @@ class Utils {
     static cueEndPoint = this.cueLength + this.cueHitPower
     static friction = 0.99
     static basePowerMultiplyer = 1
-    static draw(lineDash, startX, startY, endX, endY, strokeStyle, fillStyle, lineWidth, arc, arcSize, arcLength = 2 * Math.PI, blurAmount, blurColor) {
+    static draw(lineDash, startX, startY, endX, endY, strokeStyle, fillStyle, lineWidth, arc, arcSize, arcLength = 2 * Math.PI) {
         Canvas.ctx.save()
         Canvas.ctx.beginPath();
         Canvas.ctx.setLineDash(lineDash); 
         Canvas.ctx.strokeStyle = strokeStyle;
         Canvas.ctx.fillStyle = fillStyle
         Canvas.ctx.lineWidth = lineWidth;
-        Canvas.ctx.shadowBlur = blurAmount;
-        Canvas.ctx.shadowColor = blurColor;
         if (!arc) {
             Canvas.ctx.moveTo(startX, startY)
             Canvas.ctx.lineTo(endX, endY);
