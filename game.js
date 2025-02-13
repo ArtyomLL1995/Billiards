@@ -13,7 +13,6 @@
 class Game {
     
     static isAnyBallMoving = false
-    static mouseUpInterval
     static predictionAngle
     static hitBallPredictionAngle
 
@@ -29,7 +28,7 @@ class Game {
     }
 
     static initializePockets() {
-        const pocketSize = Utils.ballSize * 2
+        const pocketSize = Utils.ballRadius * 2
         this.pockets.push({ x: Canvas.leftOffset, y: Canvas.topOffset, size: pocketSize, color: 'black' })
         this.pockets.push({ x: Canvas.leftOffset + Canvas.fieldWidth, y: Canvas.topOffset, size: pocketSize, color: 'black' })
         this.pockets.push({ x: Canvas.leftOffset + Canvas.fieldWidth, y: Canvas.topOffset + Canvas.fieldHeight, size: pocketSize, color: 'black' })
@@ -119,7 +118,7 @@ class Game {
                 Cue.playKickSound()
                 cancelAnimationFrame(this.handleMouseUpAnimation)
                 Utils.cueHitPower = Utils.startOffset
-                Utils.cueStartPoint = Utils.ballSize + Utils.cueHitPower
+                Utils.cueStartPoint = Utils.ballRadius + Utils.cueHitPower
                 Utils.cueEndPoint = Utils.cueLength + Utils.cueHitPower
                 Game.balls[0].velocity.x = Math.cos(Cue.cueAngle) * this.currentAccumulatedPower
                 Game.balls[0].velocity.y = Math.sin(Cue.cueAngle) * this.currentAccumulatedPower
@@ -178,7 +177,7 @@ class Cue {
         Canvas.ctx.save()
         Canvas.ctx.translate(Game.balls[0].x, Game.balls[0].y)
         Canvas.ctx.rotate(Cue.cueAngle)
-        Canvas.ctx.drawImage(this.cueImage, -500-Utils.cueStartPoint, -33, 500, 80)
+        Canvas.ctx.drawImage(this.cueImage, -Utils.cueLength-Utils.cueStartPoint, -33, Utils.cueLength, 80)
         Canvas.ctx.restore()
     }
 
@@ -196,7 +195,7 @@ class Cue {
                     const currentDx = Game.balls[i].x - endX;
                     const currentDy = Game.balls[i].y - endY;
                     const currentDistance = Math.sqrt(currentDx * currentDx + currentDy * currentDy);
-                    if (currentDistance <= Utils.ballSize * 2) {
+                    if (currentDistance <= Utils.ballRadius * 2) {
                         ballTrajectoryCollision = true
                         const {ball2Angle, ball1Angle} = Utils.calculateReflectionAngles(currentDx,currentDy)
                         Game.predictionAngle = ball2Angle
@@ -212,15 +211,15 @@ class Cue {
                 const predictionEndY = endY + lineLength * Math.sin(Game.predictionAngle);
                 const whiteBallPredictionEndX = endX + lineLength / 2 * Math.cos(Game.hitBallPredictionAngle);
                 const whiteBallPredictionEndY = endY + lineLength / 2 * Math.sin(Game.hitBallPredictionAngle);
-                Utils.draw([], endX, endY, null, null, 'white', null, 1, true, Utils.ballSize);
+                Utils.draw([], endX, endY, null, null, 'white', null, 1, true, Utils.ballRadius);
                 Utils.draw([5, 5], endX, endY, predictionEndX, predictionEndY, 'white', null, 1);
                 Utils.draw([5, 5], endX, endY, whiteBallPredictionEndX, whiteBallPredictionEndY, 'white', null, 1);
                 return {endX, endY}
             } else if (pocketCollision) {
-                Utils.draw([], endX, endY, null, null, 'red', null, 1, true, Utils.ballSize);
+                Utils.draw([], endX, endY, null, null, 'red', null, 1, true, Utils.ballRadius);
                 return {endX, endY}
             } else if (Utils.xHitWallCollision(endX) || Utils.yHitWallCollision(endY)) {
-                Utils.draw([], endX, endY, null, null, 'white', null, 1, true, Utils.ballSize)
+                Utils.draw([], endX, endY, null, null, 'white', null, 1, true, Utils.ballRadius)
                 let newAngle
                 if (Utils.xHitWallCollision(endX)) {
                     newAngle = Math.PI - Cue.cueAngle
@@ -271,7 +270,7 @@ class Ball {
             Utils.updateVelocity(this, Utils.friction)
         }
         this.ballImage.src = this.color == 'white' ? 'images/white_ball.png' : 'images/red_ball.png'
-        Canvas.ctx.drawImage(this.ballImage, this.x - Utils.ballSize, this.y - Utils.ballSize, Utils.ballDiameter * 1.3, Utils.ballDiameter * 1.3)
+        Canvas.ctx.drawImage(this.ballImage, this.x - Utils.ballRadius, this.y - Utils.ballRadius, Utils.ballDiameter * 1.3, Utils.ballDiameter * 1.3)
     }
     currentSound
     playSound(sound, volume) {
@@ -288,12 +287,12 @@ class Ball {
 
 class Utils {
     static cueLength = 500
-    static ballSize = 13
-    static ballDiameter = this.ballSize * 2
+    static ballRadius = 14
+    static ballDiameter = this.ballRadius * 2
     static startOffset = 20
     static maxPullOffset = 80
     static cueHitPower = this.startOffset
-    static cueStartPoint = this.ballSize + this.cueHitPower
+    static cueStartPoint = this.ballRadius + this.cueHitPower
     static cueEndPoint = this.cueLength + this.cueHitPower
     static friction = 0.99
     static basePowerMultiplyer = 1
@@ -320,20 +319,20 @@ class Utils {
             const ball1 = Game.balls[i];
             if (Utils.xHitWallCollision(ball1.x)) {
                 ball1.playSound('sounds/wall collide.wav', Utils.getSoundLevel(ball1))
-                if (ball1.x - Utils.ballSize < Canvas.leftOffset) {
-                    ball1.x = Canvas.leftOffset + Utils.ballSize
-                } else if (ball1.x + Utils.ballSize > Canvas.fieldWidth + Canvas.leftOffset) {
-                    ball1.x = (Canvas.fieldWidth + Canvas.leftOffset) - Utils.ballSize
+                if (ball1.x - Utils.ballRadius < Canvas.leftOffset) {
+                    ball1.x = Canvas.leftOffset + Utils.ballRadius
+                } else if (ball1.x + Utils.ballRadius > Canvas.fieldWidth + Canvas.leftOffset) {
+                    ball1.x = (Canvas.fieldWidth + Canvas.leftOffset) - Utils.ballRadius
                 }
                 ball1.velocity.x = -ball1.velocity.x;
                 Utils.updateVelocity(ball1, 0.8)
             }
             if (Utils.yHitWallCollision(ball1.y)) {
                 ball1.playSound('sounds/wall collide.wav', Utils.getSoundLevel(ball1))
-                if (ball1.y - Utils.ballSize < Canvas.topOffset) {
-                    ball1.y = Canvas.topOffset + Utils.ballSize
-                } else if (ball1.y + Utils.ballSize > Canvas.fieldHeight + Canvas.topOffset) {
-                    ball1.y = (Canvas.topOffset + Canvas.fieldHeight) - Utils.ballSize
+                if (ball1.y - Utils.ballRadius < Canvas.topOffset) {
+                    ball1.y = Canvas.topOffset + Utils.ballRadius
+                } else if (ball1.y + Utils.ballRadius > Canvas.fieldHeight + Canvas.topOffset) {
+                    ball1.y = (Canvas.topOffset + Canvas.fieldHeight) - Utils.ballRadius
                 }
                 ball1.velocity.y = -ball1.velocity.y;
                 Utils.updateVelocity(ball1, 0.8)
@@ -344,7 +343,7 @@ class Utils {
                 const dx = ball2.x - ball1.x;
                 const dy = ball2.y - ball1.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < Utils.ballSize * 2) {
+                if (distance < Utils.ballRadius * 2) {
                     ball1.playSound('sounds/ball collide.wav', Utils.getSoundLevel(ball1))
                     const nx = dx / distance;
                     const ny = dy / distance;
@@ -369,7 +368,7 @@ class Utils {
                         ball1.velocity.y += relativeVelocity * ny;
                         ball2.velocity.x -= relativeVelocity * nx;
                         ball2.velocity.y -= relativeVelocity * ny;
-                        const overlap = (Utils.ballSize * 2 - distance) / 2;
+                        const overlap = (Utils.ballRadius * 2 - distance) / 2;
                         ball1.x -= overlap * nx;
                         ball1.y -= overlap * ny;
                         ball2.x += overlap * nx;
@@ -447,10 +446,10 @@ class Utils {
         [4 * this.ballDiameter * Math.cos(Math.PI/6), 4 * this.ballDiameter * Math.sin(Math.PI/6), 15],
     ]
     static yHitWallCollision(y) {
-       return y - Utils.ballSize <= Canvas.topOffset || y + Utils.ballSize >= Canvas.fieldHeight + Canvas.topOffset
+       return y - Utils.ballRadius <= Canvas.topOffset || y + Utils.ballRadius >= Canvas.fieldHeight + Canvas.topOffset
     }
     static xHitWallCollision(x) {
-        return x - Utils.ballSize <= Canvas.leftOffset || x + Utils.ballSize >= Canvas.fieldWidth + Canvas.leftOffset
+        return x - Utils.ballRadius <= Canvas.leftOffset || x + Utils.ballRadius >= Canvas.fieldWidth + Canvas.leftOffset
     }
     static pocketCollision(x,y) {
         for (let k = 0; k < Game.pockets.length; k++) {
@@ -458,7 +457,7 @@ class Utils {
             const dx = pocket.x - x
             const dy = pocket.y - y
             const distance = Math.sqrt(dx * dx + dy * dy)
-            if (distance < Utils.ballSize + pocket.size / 2) {
+            if (distance < Utils.ballRadius + pocket.size / 2) {
                 return true
             }
         }
