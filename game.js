@@ -7,6 +7,8 @@
 // 6. Add sounds (DONE!)
 // 7 Rewrite all setIntervals with requestAnimationFrame (DONE!!)
 // 8 Change predictionLine width based on the prediction angle
+// 9 Add some rules
+// 10 Add display of scored balls
 
 class Game {
     
