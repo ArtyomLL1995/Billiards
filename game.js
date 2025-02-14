@@ -9,6 +9,8 @@
 // 8 Change predictionLine width based on the prediction angle
 // 9 Add some rules
 // 10 Add display of scored balls
+// 11 Small hit wall collision display bug
+// 12 Rewrite to typescript
 
 class Game {
     
@@ -67,15 +69,15 @@ class Game {
         const left = relativeLeft - this.balls[0].x // left relative to the cue ball
         const top = relativeTop - this.balls[0].y // top relative to the cue ball
         Cue.cueAngle = Math.atan2(top, left)
-        // const displayData = 
-        // 'Ball left: ' + this.balls[0].x + ' Ball top: ' + this.balls[0].y + '<br>' +
-        // 'Relative left: ' + relativeLeft + ' Relative top: ' + relativeTop + '<br>' +
-        // 'left: ' + left + ' top: ' + top + '<br>' +
-        // ' angle rad: ' + Cue.cueAngle + '<br>' +
-        // ' angle deg: ' + Utils.radToDeg(Cue.cueAngle) + '<br>' +
-        // 'move X: ' + 10 * Math.cos(Cue.cueAngle) + '<br>' +
-        // 'move Y: ' + 10 * Math.sin(Cue.cueAngle) + '<br>'
-        // Utils.displayData(displayData)
+        const displayData = 
+        'Ball left: ' + this.balls[0].x + ' Ball top: ' + this.balls[0].y + '<br>' +
+        'Relative left: ' + relativeLeft + ' Relative top: ' + relativeTop + '<br>' +
+        'left: ' + left + ' top: ' + top + '<br>' +
+        ' angle rad: ' + Cue.cueAngle + '<br>' +
+        ' angle deg: ' + Utils.radToDeg(Cue.cueAngle) + '<br>' +
+        'Cos: X: ' + Math.cos(Cue.cueAngle) + '<br>' +
+        'Sin: Y: ' + Math.sin(Cue.cueAngle) + '<br>'
+        Utils.displayData(displayData)
     }
 
     static handleMouseDownAnimation
@@ -345,8 +347,6 @@ class Utils {
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 if (distance < Utils.ballRadius * 2) {
                     ball1.playSound('sounds/ball collide.wav', Utils.getSoundLevel(ball1))
-                    const nx = dx / distance;
-                    const ny = dy / distance;
                     if (Game.predictionAngle != null) {
                         // Fixed angle setup for cue hits
                         const hitBallAngleDiff = Math.abs(Utils.getAngleDif(Cue.cueAngle, Game.hitBallPredictionAngle))
@@ -360,10 +360,13 @@ class Utils {
                         ball2.velocity.y = Math.sin(Game.predictionAngle) * ball2VelocityPart
                     } else {
                         // Dynamic angle setup for collision hits
+                        const collisionAngle = Math.atan2(dy, dx) 
+                        const nx = Math.cos(collisionAngle)
+                        const ny = Math.sin(collisionAngle)
                         const dvx = ball2.velocity.x - ball1.velocity.x;
                         const dvy = ball2.velocity.y - ball1.velocity.y;
-                        const relativeVelocity = dvx * nx + dvy * ny;
-                        //if (relativeVelocity > 0) continue;
+                        const relativeVelocity = nx * dvx + ny * dvy;
+                        if (relativeVelocity > 0) continue;
                         ball1.velocity.x += relativeVelocity * nx;
                         ball1.velocity.y += relativeVelocity * ny;
                         ball2.velocity.x -= relativeVelocity * nx;
