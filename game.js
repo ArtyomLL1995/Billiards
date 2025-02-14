@@ -30,7 +30,7 @@ class Game {
     }
 
     static initializePockets() {
-        const pocketSize = Utils.ballRadius * 2
+        const pocketSize = Utils.ballRadius * 1.8
         this.pockets.push({ x: Canvas.leftOffset, y: Canvas.topOffset, size: pocketSize, color: 'black' })
         this.pockets.push({ x: Canvas.leftOffset + Canvas.fieldWidth, y: Canvas.topOffset, size: pocketSize, color: 'black' })
         this.pockets.push({ x: Canvas.leftOffset + Canvas.fieldWidth, y: Canvas.topOffset + Canvas.fieldHeight, size: pocketSize, color: 'black' })
@@ -171,11 +171,6 @@ class Cue {
 
     static drawCue() {
         this.cueImage.src = 'images/cue.png'
-        // this.startX = Game.balls[0].x + (Utils.cueStartPoint * -Math.cos(Cue.cueAngle))
-        // this.startY = Game.balls[0].y + (Utils.cueStartPoint * -Math.sin(Cue.cueAngle))
-        // this.endX = Game.balls[0].x + (Utils.cueEndPoint * -Math.cos(Cue.cueAngle))
-        // this.endY = Game.balls[0].y + (Utils.cueEndPoint * -Math.sin(Cue.cueAngle))
-        // Utils.draw([], this.startX, this.startY, this.endX, this.endY, 'black', null, 1, false,null,null,20,'black')
         Canvas.ctx.save()
         Canvas.ctx.translate(Game.balls[0].x, Game.balls[0].y)
         Canvas.ctx.rotate(Cue.cueAngle)
@@ -271,8 +266,14 @@ class Ball {
         } else {
             Utils.updateVelocity(this, Utils.friction)
         }
+        Canvas.ctx.save()
+        Canvas.ctx.shadowColor = 'grey'; // Shadow color
+        Canvas.ctx.shadowBlur = 10; // Blur level
+        Canvas.ctx.shadowOffsetX = 0; // Horizontal offset
+        Canvas.ctx.shadowOffsetY = 0; // Vertical offset
         this.ballImage.src = this.color == 'white' ? 'images/white_ball.png' : 'images/red_ball.png'
-        Canvas.ctx.drawImage(this.ballImage, this.x - Utils.ballRadius, this.y - Utils.ballRadius, Utils.ballDiameter * 1.3, Utils.ballDiameter * 1.3)
+        Canvas.ctx.drawImage(this.ballImage, this.x - Utils.ballRadius, this.y - Utils.ballRadius, Utils.ballDiameter, Utils.ballDiameter)
+        Canvas.ctx.restore()
     }
     currentSound
     playSound(sound, volume) {
@@ -289,7 +290,7 @@ class Ball {
 
 class Utils {
     static cueLength = 500
-    static ballRadius = 14
+    static ballRadius = 15
     static ballDiameter = this.ballRadius * 2
     static startOffset = 20
     static maxPullOffset = 80
