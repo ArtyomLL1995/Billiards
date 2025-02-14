@@ -69,15 +69,15 @@ class Game {
         const left = relativeLeft - this.balls[0].x // left relative to the cue ball
         const top = relativeTop - this.balls[0].y // top relative to the cue ball
         Cue.cueAngle = Math.atan2(top, left)
-        const displayData = 
-        'Ball left: ' + this.balls[0].x + ' Ball top: ' + this.balls[0].y + '<br>' +
-        'Relative left: ' + relativeLeft + ' Relative top: ' + relativeTop + '<br>' +
-        'left: ' + left + ' top: ' + top + '<br>' +
-        ' angle rad: ' + Cue.cueAngle + '<br>' +
-        ' angle deg: ' + Utils.radToDeg(Cue.cueAngle) + '<br>' +
-        'Cos: X: ' + Math.cos(Cue.cueAngle) + '<br>' +
-        'Sin: Y: ' + Math.sin(Cue.cueAngle) + '<br>'
-        Utils.displayData(displayData)
+        // const displayData = 
+        // 'Ball left: ' + this.balls[0].x + ' Ball top: ' + this.balls[0].y + '<br>' +
+        // 'Relative left: ' + relativeLeft + ' Relative top: ' + relativeTop + '<br>' +
+        // 'left: ' + left + ' top: ' + top + '<br>' +
+        // ' angle rad: ' + Cue.cueAngle + '<br>' +
+        // ' angle deg: ' + Utils.radToDeg(Cue.cueAngle) + '<br>' +
+        // 'Cos: X: ' + Math.cos(Cue.cueAngle) + '<br>' +
+        // 'Sin: Y: ' + Math.sin(Cue.cueAngle) + '<br>'
+        // Utils.displayData(displayData)
     }
 
     static handleMouseDownAnimation
