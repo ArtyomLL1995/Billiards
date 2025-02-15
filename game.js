@@ -3,13 +3,13 @@
 // 2. Add pockets (and goals functionality) (DONE!)
 // 3. Add twisted movement functionality
 // 4. Add some textures (DONE!!)
-// 5. Add shadows (for cue and balls)
+// 5. Add shadows (for cue and balls) (DONE!)
 // 6. Add sounds (DONE!)
 // 7 Rewrite all setIntervals with requestAnimationFrame (DONE!!)
 // 8 Change predictionLine width based on the prediction angle
 // 9 Add some rules
 // 10 Add display of scored balls
-// 11 Small hit wall collision display bug
+// 11 Small hit wall collision display bug (DONE!)
 // 12 Rewrite to typescript
 
 class Game {
@@ -174,6 +174,10 @@ class Cue {
         Canvas.ctx.save()
         Canvas.ctx.translate(Game.balls[0].x, Game.balls[0].y)
         Canvas.ctx.rotate(Cue.cueAngle)
+        Canvas.ctx.shadowColor = 'black';
+        Canvas.ctx.shadowBlur = 5;
+        Canvas.ctx.shadowOffsetX = 10;
+        Canvas.ctx.shadowOffsetY = 5;
         Canvas.ctx.drawImage(this.cueImage, -Utils.cueLength-Utils.cueStartPoint, -33, Utils.cueLength, 80)
         Canvas.ctx.restore()
     }
