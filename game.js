@@ -150,12 +150,12 @@ class Canvas {
         this.fieldCoords = this.canvas.getBoundingClientRect()
     }
     static drawField() {
-        const innerBorderWidth = 18
+        const innerBorderWidth = 42
         this.ctx.fillStyle = "rgba(0,159,1,255)";
         this.ctx.fillRect(this.leftOffset, this.topOffset, this.fieldWidth, this.fieldHeight);
         this.ctx.lineWidth = innerBorderWidth;
         this.ctx.setLineDash([]);
-        this.ctx.strokeStyle = 'rgba(1,56,139,255)';
+        this.ctx.strokeStyle = 'rgb(0, 119, 0)';
         this.ctx.strokeRect(this.leftOffset - (innerBorderWidth/2), this.topOffset - (innerBorderWidth/2), this.fieldWidth + innerBorderWidth, this.fieldHeight + innerBorderWidth);
     }
 }
@@ -355,7 +355,7 @@ class Utils {
                     if (Game.predictionAngle != null) {
                         // Fixed angle setup for cue hits
                         const hitBallAngleDiff = Math.abs(Utils.getAngleDif(Cue.cueAngle, Game.hitBallPredictionAngle))
-                        const hitBallPercentage = Math.max(((hitBallAngleDiff / (Math.PI / 2)) * 100), 5) ;
+                        const hitBallPercentage = Math.max(((hitBallAngleDiff / (Math.PI / 2)) * 100), 5);
                         const currentVelocity = Math.abs(ball1.velocity.x) + Math.abs(ball1.velocity.y)
                         const ball2VelocityPart = (currentVelocity / 100) * hitBallPercentage
                         const ball1VelocityPart = currentVelocity - ball2VelocityPart
