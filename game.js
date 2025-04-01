@@ -6,7 +6,7 @@
 // 5. Add shadows (for cue and balls) (DONE!)
 // 6. Add sounds (DONE!)
 // 7 Rewrite all setIntervals with requestAnimationFrame (DONE!!)
-// 8 Change predictionLine width based on the prediction angle
+// 8 Change predictionLine width based on the prediction angle (DONE!)
 // 9 Add some rules
 // 10 Add display of scored balls
 // 11 Small hit wall collision display bug (DONE!)
@@ -43,7 +43,7 @@ class Game {
         Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
         Canvas.drawField()
         this.pockets.forEach(pocket => {
-            Utils.draw([],pocket.x,pocket.y,null,null,null,pocket.color,null,true,pocket.size)
+            Utils.draw([],pocket.x,pocket.y,null,null,null,pocket.color,null,pocket.size)
         })
         Utils.handleCollisions()
         this.balls.forEach(ball => {
@@ -208,28 +208,33 @@ class Cue {
             const pocketCollision = Utils.pocketCollision(endX,endY)
             if (ballTrajectoryCollision) {
                 const lineLength = 100;
+                const hitBallLineLength = 70;
                 const predictionEndX = endX + lineLength * Math.cos(Game.predictionAngle);
                 const predictionEndY = endY + lineLength * Math.sin(Game.predictionAngle);
-                const whiteBallPredictionEndX = endX + lineLength / 2 * Math.cos(Game.hitBallPredictionAngle);
-                const whiteBallPredictionEndY = endY + lineLength / 2 * Math.sin(Game.hitBallPredictionAngle);
-                Utils.draw([], endX, endY, null, null, 'white', null, 1, true, Utils.ballRadius);
-                Utils.draw([5, 5], endX, endY, predictionEndX, predictionEndY, 'white', null, 1);
-                Utils.draw([5, 5], endX, endY, whiteBallPredictionEndX, whiteBallPredictionEndY, 'white', null, 1);
+                const hitBallAngleDiff = Math.abs(Utils.getAngleDif(Cue.cueAngle, Game.predictionAngle))
+                const hitBallPercentage = hitBallAngleDiff / (Math.PI / 2);
+                const hitBallPredictionEndX = endX + (hitBallLineLength * hitBallPercentage) * Math.cos(Game.hitBallPredictionAngle);
+                const hitBallPredictionEndY = endY + (hitBallLineLength * hitBallPercentage) * Math.sin(Game.hitBallPredictionAngle);
+                Utils.draw([], endX, endY, null, null, 'white', null, 1, Utils.ballRadius);
+                Utils.draw([4,4], endX, endY, predictionEndX, predictionEndY, 'white', null, 1);
+                Utils.draw([4,4], endX, endY, hitBallPredictionEndX, hitBallPredictionEndY, 'white', null, 1);
                 return {endX, endY}
             } else if (pocketCollision) {
-                Utils.draw([], endX, endY, null, null, 'red', null, 1, true, Utils.ballRadius);
+                Utils.draw([], endX, endY, null, null, 'red', null, 1, Utils.ballRadius);
                 return {endX, endY}
             } else if (Utils.xHitWallCollision(endX) || Utils.yHitWallCollision(endY)) {
-                Utils.draw([], endX, endY, null, null, 'white', null, 1, true, Utils.ballRadius)
+                Utils.draw([], endX, endY, null, null, 'white', null, 1, Utils.ballRadius)
                 let newAngle
                 if (Utils.xHitWallCollision(endX)) {
                     newAngle = Math.PI - Cue.cueAngle
                 } else if (Utils.yHitWallCollision(endY)) {
                     newAngle = - Cue.cueAngle
                 }
-                let newX = endX + 70 * Math.cos(newAngle)
-                let newY = endY + 70 * Math.sin(newAngle)
-                Utils.draw([5, 5], endX, endY, newX, newY, 'white', null, 1)
+                const hitBallAngleDiff = Math.abs(Utils.getAngleDif(Cue.cueAngle, newAngle))
+                const hitBallPercentage = hitBallAngleDiff / (Math.PI / 2);
+                let newX = endX + (50 / hitBallPercentage) * Math.cos(newAngle)
+                let newY = endY + (50 / hitBallPercentage) * Math.sin(newAngle)
+                Utils.draw([4,4], endX, endY, newX, newY, 'white', null, 1)
                 Utils.nullifyPredicitonAngles()
                 return {endX, endY}
             } else {
@@ -237,7 +242,7 @@ class Cue {
                 return calcTrajectoryLine()
             }
         }
-        Utils.draw([5, 5], startX, startY, endX,  endY, 'white', null, 1)
+        Utils.draw([4,4], startX, startY, endX,  endY, 'white', null, 1)
     }
     static kickSound
     static playKickSound() {
@@ -293,7 +298,7 @@ class Ball {
 }
 
 class Utils {
-    static cueLength = 500
+    static cueLength = 650
     static ballRadius = 15
     static ballDiameter = this.ballRadius * 2
     static startOffset = 20
@@ -303,14 +308,14 @@ class Utils {
     static cueEndPoint = this.cueLength + this.cueHitPower
     static friction = 0.99
     static basePowerMultiplyer = 1
-    static draw(lineDash, startX, startY, endX, endY, strokeStyle, fillStyle, lineWidth, arc, arcSize, arcLength = 2 * Math.PI) {
+    static draw(lineDash, startX, startY, endX, endY, strokeStyle, fillStyle, lineWidth, arcSize, arcLength = 2 * Math.PI) {
         Canvas.ctx.save()
         Canvas.ctx.beginPath();
         Canvas.ctx.setLineDash(lineDash); 
         Canvas.ctx.strokeStyle = strokeStyle;
         Canvas.ctx.fillStyle = fillStyle
         Canvas.ctx.lineWidth = lineWidth;
-        if (!arc) {
+        if (!arcSize) {
             Canvas.ctx.moveTo(startX, startY)
             Canvas.ctx.lineTo(endX, endY);
         } else {
