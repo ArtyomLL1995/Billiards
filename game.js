@@ -231,9 +231,10 @@ class Cue {
                     newAngle = - Cue.cueAngle
                 }
                 const hitBallAngleDiff = Math.abs(Utils.getAngleDif(Cue.cueAngle, newAngle))
-                const hitBallPercentage = hitBallAngleDiff / (Math.PI / 2);
-                let newX = endX + (50 / hitBallPercentage) * Math.cos(newAngle)
-                let newY = endY + (50 / hitBallPercentage) * Math.sin(newAngle)
+                const hitBallAngleDiffDeg = 180 - Utils.radToDeg(hitBallAngleDiff)
+                const percent = hitBallAngleDiffDeg / 180
+                let newX = endX + (70 * percent) * Math.cos(newAngle)
+                let newY = endY + (70 * percent) * Math.sin(newAngle)
                 Utils.draw([4,4], endX, endY, newX, newY, 'white', null, 1)
                 Utils.nullifyPredicitonAngles()
                 return {endX, endY}
