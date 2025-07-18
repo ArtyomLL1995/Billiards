@@ -12,8 +12,6 @@
 // 11 Small hit wall collision display bug (DONE!)
 // 12 Rewrite to typescript
 
-// New info
-
 class Game {
     
     static isAnyBallMoving = false
